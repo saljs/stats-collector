@@ -1,20 +1,18 @@
 version: '3.1'
-
 services:
   database:
-    image: mariadb:latest
+    image: 'mysql:latest'
     restart: always
     environment:
-      MARIADB_DATABASE: vivmontors
-      MARIADB_ROOT_PASSWORD: changeme
-      MARIADB_USER: stats_collector
-      MARIADB_PASSWORD: changeme
-  
+      MYSQL_DATABASE: vivmontors
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_USER: stats_collector
+      MYSQL_PASSWORD: changeme
   collector:
-    image: stats_collector:latest
+    image: 'stats_collector:latest'
     restart: always
     ports:
-      - 5000:5000
+      - '5000:5000'
     environment:
-      DB_CONN: mysql+pymysql://stats_collector:changeme@database/vivmonitors
+      DB_CONN: 'mysql+pymysql://stats_collector:changeme@database/vivmonitors'
       PORT: 5000
