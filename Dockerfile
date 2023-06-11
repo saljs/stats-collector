@@ -1,5 +1,8 @@
 FROM python:3.11-alpine
 
+# Install packages
+RUN apk add build-base
+
 # copy the requirements file into the image
 COPY ./requirements.txt /app/requirements.txt
 
