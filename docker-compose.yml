@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   database:
-    image: 'mysql:latest'
+    image: 'hypriot/rpi-mysql:latest'
     restart: always
     environment:
       MYSQL_DATABASE: vivmontors

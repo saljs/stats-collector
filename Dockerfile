@@ -13,7 +13,7 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 # copy the rest of the files
-COPY . /app
+COPY . .
 
 # Expose default port
 EXPOSE 5000
@@ -23,4 +23,4 @@ ENV FLASK_APP=stats_collector.py
 
 # set entrypoint cmd
 ENTRYPOINT ["python"]
-CMD ["flask", "run", "--host", "0.0.0.0"]
+CMD ["-m", "flask", "run", "--host", "0.0.0.0"]
