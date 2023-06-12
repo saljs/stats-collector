@@ -3,8 +3,10 @@ services:
   database:
     image: 'hypriot/rpi-mysql:latest'
     restart: always
+    ports:
+      - '3306:3306'
     environment:
-      MYSQL_DATABASE: vivmontors
+      MYSQL_DATABASE: vivmonitors
       MYSQL_ROOT_PASSWORD: changeme
       MYSQL_USER: stats_collector
       MYSQL_PASSWORD: changeme
