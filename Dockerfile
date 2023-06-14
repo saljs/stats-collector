@@ -1,7 +1,7 @@
 FROM python:3.11-alpine
 
 # Install packages
-RUN apk add build-base
+RUN apk add build-base tzdata
 
 # copy the requirements file into the image
 COPY ./requirements.txt /app/requirements.txt
@@ -20,6 +20,7 @@ EXPOSE 5000
 
 # Set env variables
 ENV FLASK_APP=stats_collector.py
+ENV TZ=America/Chicago
 
 # set entrypoint cmd
 ENTRYPOINT ["python"]
