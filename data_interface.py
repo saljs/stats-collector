@@ -53,7 +53,7 @@ class StatsInstance(Base):
 
         timestamp = stats["timestamp"]
         if not isinstance(timestamp, datetime.datetime):
-            timestamp = datetime.datetime.fromisoformat(timestamp)
+            timestamp = datetime.datetime.fromisoformat(timestamp).astimezone(datetime.timezone.utc)
 
         return cls(
             id=stats["id"],
