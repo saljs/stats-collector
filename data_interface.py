@@ -1,4 +1,5 @@
 import datetime
+from random import randrange
 from typing import Any, Dict
 
 from sqlalchemy import create_engine, DateTime, Integer, Float, String
@@ -54,6 +55,9 @@ class StatsInstance(Base):
         timestamp = stats["timestamp"]
         if not isinstance(timestamp, datetime.datetime):
             timestamp = datetime.datetime.fromisoformat(timestamp).astimezone(datetime.timezone.utc)
+            # Add in a random milliseconds component, to prevent updates soming in at the same time
+            #   from different devices from conflicting.
+            timestamp += datetime.timedelta(microseconds=randrange(1000000))
 
         return cls(
             id=stats["id"],
