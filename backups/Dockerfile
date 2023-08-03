@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.17
 
 # Install packages
 RUN apk add mysql-client supercronic
