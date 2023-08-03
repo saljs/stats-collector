@@ -18,3 +18,14 @@ services:
     environment:
       DB_CONN: 'mysql+pymysql://stats_collector:changeme@database/vivmonitors'
       PORT: 5000
+  backups:
+    image: 'backup-server:latest'
+    restart: always
+    volumes:
+      - '/mnt/backup:/backups'
+    environment:
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_USER: stats_collector
+      DB_PASSWORD: changeme
+      OUT_PATH: '/backups'

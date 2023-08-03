@@ -3,4 +3,5 @@
 __pycache__
 Makefile
 Dockerfile
+backups
 test.db
