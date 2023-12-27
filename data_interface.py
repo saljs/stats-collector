@@ -32,7 +32,7 @@ class FirmwareFile(Base):
     name: Mapped[str] = mapped_column(String, primary_key=True)
     lib_version: Mapped[str] = mapped_column(String)
     hash: Mapped[str] = mapped_column(String)
-    firmware: Mapped[bytes] = mapped_column(LargeBinary)
+    firmware: Mapped[bytes] = mapped_column(LargeBinary(4194304)) # 4MB per row
 
     @property
     def version(self) -> str:
