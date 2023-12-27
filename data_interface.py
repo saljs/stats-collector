@@ -20,6 +20,7 @@ from sqlalchemy.orm import (
 )
 
 FW_FILE_RE = re.compile(r"^(\w+)-((\d+\.)*\d+)-([a-fA-F0-9]{32})\.bin")
+DB_STR_LEN = 256
 
 class Base(DeclarativeBase):
     """Base class for object models."""
@@ -29,9 +30,9 @@ class FirmwareFile(Base):
     """Represents a firmware file for one or more monitors."""
     __tablename__ = "firmware_files"
 
-    name: Mapped[str] = mapped_column(String, primary_key=True)
-    lib_version: Mapped[str] = mapped_column(String)
-    hash: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String(DB_STR_LEN), primary_key=True)
+    lib_version: Mapped[str] = mapped_column(String(DB_STR_LEN))
+    hash: Mapped[str] = mapped_column(String(DB_STR_LEN))
     firmware: Mapped[bytes] = mapped_column(LargeBinary(4194304)) # 4MB per row
 
     @property
