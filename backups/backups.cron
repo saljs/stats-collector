@@ -1,4 +1,0 @@
-# Cron file for running backup operations
-
-# run backups every 5 hours
-0 */5 * * * /app/backup-db.sh

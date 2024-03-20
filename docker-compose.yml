@@ -1,10 +1,8 @@
 version: '3.1'
 services:
   database:
-    image: 'hypriot/rpi-mysql:latest'
+    image: 'mysql:latest'
     restart: always
-    ports:
-      - '3306:3306'
     environment:
       MYSQL_DATABASE: vivmonitors
       MYSQL_ROOT_PASSWORD: changeme
@@ -19,14 +17,8 @@ services:
       DB_CONN: 'mysql+pymysql://stats_collector:changeme@database/vivmonitors'
       PORT: 5000
       FIRMWARE_URL: 'https://github.com/saljs/viv_clients/releases/latest/download/fw_bundle.zip'
-  backups:
-    image: 'backup-server:latest'
+  grafana:
+    image: 'grafana/grafana:latest'
     restart: always
-    volumes:
-      - '/mnt/backup:/backups'
-    environment:
-      DB_HOST: database
-      DB_PORT: 3306
-      DB_USER: stats_collector
-      DB_PASSWORD: changeme
-      OUT_PATH: '/backups'
+    ports:
+      - '3000:80'
