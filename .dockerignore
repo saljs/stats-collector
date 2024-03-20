@@ -4,4 +4,5 @@ __pycache__
 Makefile
 Dockerfile
 backups
+docker-compose.yml
 test.db
