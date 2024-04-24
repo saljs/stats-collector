@@ -33,8 +33,15 @@ class MonitorNode(Base):
     __tablename__ = "nodes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(DB_STR_LEN))
-    last_ip: Mapped[str] = mapped_column(String(DB_STR_LEN))
+    name: Mapped[str] = mapped_column(String(DB_STR_LEN), nullable=True)
+    last_ip: Mapped[str] = mapped_column(String(DB_STR_LEN), nullable=True)
+
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "last_ip": self.last_ip,
+        }
 
 class FirmwareFile(Base):
     """Represents a firmware file for one or more monitors."""
@@ -185,7 +192,7 @@ class DataInterface:
             names = session.query(FirmwareFile.name)
             return [r.name for r in names]
 
-    def set_node_name(self, nodeId: int, name: str) -> MonitorNode:
+    def set_node_name(self, nodeId: int, name: str) -> Dict[str, Any]:
         """Sets the name of the node to the given value. If node does not exist, creates it."""
         if len(name) >= DB_STR_LEN:
             raise ValueError(f"The name {name} is longer than {DB_STR_LEN} characters.")
@@ -197,10 +204,10 @@ class DataInterface:
             else:
                 nodeInfo.name = name
             session.commit()
-            return nodeInfo
+            return nodeInfo.as_dict()
 
-    def get_nodes(self) -> List[MonitorNode]:
+    def get_nodes(self) -> List[Dict[str, Any]]:
         """Gets all of the monitor nodes from the node table."""
         with Session(self._engine) as session:
             nodes = session.query(MonitorNode)
-            return list(nodes)
+            return [n.as_dict() for n in nodes]
