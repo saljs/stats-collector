@@ -19,7 +19,7 @@ COPY . .
 EXPOSE 5000
 
 # Set env variables
-ENV FLASK_APP=stats_collector.py
+ENV FLASK_APP=api_server.py
 ENV TZ=America/Chicago
 
 # set entrypoint cmd

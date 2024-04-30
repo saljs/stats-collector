@@ -8,6 +8,8 @@ services:
       MYSQL_ROOT_PASSWORD: changeme
       MYSQL_USER: stats_collector
       MYSQL_PASSWORD: changeme
+    volumes:
+      - 'mysql-db:/var/lib/mysql'
   collector:
     image: 'ghcr.io/saljs/stats-collector:main'
     restart: always
@@ -22,3 +24,10 @@ services:
     restart: always
     ports:
       - '3000:80'
+    volumes:
+      - 'grafana-data:/var/lib/grafana'
+volumes:
+  grafana-data:
+    name: grafana-data-vol
+  mysql-db:
+    name: mysql-db-vol

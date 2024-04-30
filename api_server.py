@@ -28,20 +28,20 @@ if "FIRMWARE_URL" in os.environ:
 def collect():
     stats = request.get_json()
     try:
-        db.ingest(stats)
+        db.ingest(stats, request.remote_addr)
         return "Success", 200
     except AttributeError:
         return "Bad Request", 400
 
 @app.route('/', methods=['GET'])
 def homepage():
-    return "Vivarium stats server version 1.2", 200
+    return "Vivarium stats server version 1.3", 200
 
 @app.route('/fw', methods=['GET'])
 def firmware_list():
     fwlist = db.get_firmware_names()
     return json.jsonify(fwlist)
-    
+
 @app.route('/fw/<fwname>', methods=['GET'])
 def firmware(fwname: str):
     fw = db.get_firmware(fwname)
@@ -61,6 +61,16 @@ def firmware(fwname: str):
     # Ignore firmware bytes, send metadata
     fw.pop("firmware")
     return json.jsonify(fw)
+
+@app.route('/nodes', methods=['GET'])
+def node_list():
+    return json.jsonify(db.get_nodes())
+
+@app.route('/nodes/<int:nodeId>', methods=['POST'])
+def name_node(nodeId: int):
+    if "name" not in request.values:
+        return "Bad Request", 400
+    return json.jsonify(db.set_node_name(nodeId, request.values["name"]))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

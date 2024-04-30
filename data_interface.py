@@ -26,6 +26,23 @@ class Base(DeclarativeBase):
     """Base class for object models."""
     pass
 
+class MonitorNode(Base):
+    """Represents data about particular nodes submitting stats. By default,
+    nodes do not have descriptive names, so they will need to be added by an
+    API call."""
+    __tablename__ = "nodes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(DB_STR_LEN), nullable=True)
+    last_ip: Mapped[str] = mapped_column(String(DB_STR_LEN), nullable=True)
+
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "last_ip": self.last_ip,
+        }
+
 class FirmwareFile(Base):
     """Represents a firmware file for one or more monitors."""
     __tablename__ = "firmware_files"
@@ -132,10 +149,17 @@ class DataInterface:
         self._engine = create_engine(conn_string)
         Base.metadata.create_all(self._engine)
 
-    def ingest(self, stats: Dict[str, Any]):
+    def ingest(self, stats: Dict[str, Any], ip: Optional[str] = None):
         """Add a new stats instance to the database."""
         instance = StatsInstance.from_dict(stats)
         with Session(self._engine) as session:
+            nodeInfo = session.query(MonitorNode).filter(MonitorNode.id == stats["id"]).one_or_none()
+            if nodeInfo is None:
+                # Add entry to node list
+                nodeInfo = MonitorNode(id=stats["id"], name=str(stats["id"]))
+                session.add(nodeInfo)
+            if ip is not None:
+                nodeInfo.last_ip = ip
             session.add(instance)
             session.commit()
 
@@ -163,6 +187,27 @@ class DataInterface:
             return fw.as_dict()
 
     def get_firmware_names(self) -> List[str]:
+        """Gets a list of all firmware names."""
         with Session(self._engine) as session:
             names = session.query(FirmwareFile.name)
             return [r.name for r in names]
+
+    def set_node_name(self, nodeId: int, name: str) -> Dict[str, Any]:
+        """Sets the name of the node to the given value. If node does not exist, creates it."""
+        if len(name) >= DB_STR_LEN:
+            raise ValueError(f"The name {name} is longer than {DB_STR_LEN} characters.")
+        with Session(self._engine) as session:
+            nodeInfo = session.query(MonitorNode).filter(MonitorNode.id == nodeId).one_or_none()
+            if nodeInfo is None:
+                nodeInfo = MonitorNode(id=nodeId, name=name)
+                session.add(nodeInfo)
+            else:
+                nodeInfo.name = name
+            session.commit()
+            return nodeInfo.as_dict()
+
+    def get_nodes(self) -> List[Dict[str, Any]]:
+        """Gets all of the monitor nodes from the node table."""
+        with Session(self._engine) as session:
+            nodes = session.query(MonitorNode)
+            return [n.as_dict() for n in nodes]
