@@ -163,6 +163,11 @@ class TestEndpoints(unittest.TestCase):
         response = client.post("/", json=mock_stats())
         self.assertEqual(response.status_code, 200)
 
+        null_stats = mock_stats()
+        null_stats["humidity"] = None
+        response = client.post("/", json=null_stats)
+        self.assertEqual(response.status_code, 200)
+
         bad_stats = mock_stats()
         del bad_stats["digital_1"]
         response = client.post("/", json=bad_stats)

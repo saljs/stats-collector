@@ -91,10 +91,10 @@ class StatsInstance(Base):
     timestamp: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), primary_key=True
     )
-    high_temp: Mapped[float] = mapped_column(Float)
-    low_temp: Mapped[float] = mapped_column(Float)
-    air_temp: Mapped[float] = mapped_column(Float)
-    humidity: Mapped[float] = mapped_column(Float)
+    high_temp: Mapped[float] = mapped_column(Float, nullable=True)
+    low_temp: Mapped[float] = mapped_column(Float, nullable=True)
+    air_temp: Mapped[float] = mapped_column(Float, nullable=True)
+    humidity: Mapped[float] = mapped_column(Float, nullable=True)
 
     digital_1: Mapped[int] = mapped_column(Integer)
     digital_2: Mapped[int] = mapped_column(Integer)
