@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import re
-from random import randrange
 from typing import Any, Dict, List, Optional
 from zipfile import ZipFile
 from sqlalchemy import (
@@ -87,10 +86,9 @@ class StatsInstance(Base):
     """Represents a stats instance passed by a monitor."""
     __tablename__ = "stats_entries"
 
+    entry_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id: Mapped[int] = mapped_column(Integer)
-    timestamp: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), primary_key=True
-    )
+    timestamp: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
     high_temp: Mapped[float] = mapped_column(Float, nullable=True)
     low_temp: Mapped[float] = mapped_column(Float, nullable=True)
     air_temp: Mapped[float] = mapped_column(Float, nullable=True)
@@ -124,9 +122,6 @@ class StatsInstance(Base):
         timestamp = stats["timestamp"]
         if not isinstance(timestamp, datetime.datetime):
             timestamp = datetime.datetime.fromisoformat(timestamp).astimezone(datetime.timezone.utc)
-            # Add in a random milliseconds component, to prevent updates coming in at the same time
-            #   from different devices from conflicting.
-            timestamp += datetime.timedelta(microseconds=randrange(1000000))
 
         return cls(
             id=stats["id"],
