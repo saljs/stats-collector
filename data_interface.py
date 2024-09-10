@@ -5,11 +5,15 @@ from typing import Any, Dict, List, Optional
 from zipfile import ZipFile
 from sqlalchemy import (
     create_engine,
+    text,
+    Column,
     DateTime,
     Integer,
     Float,
     LargeBinary,
+    MetaData,
     String,
+    Table,
 )
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -134,8 +138,7 @@ class StatsInstance(Base):
             digital_2=stats["digital_2"],
             analog=stats["analog"],
         )
-     
-
+ 
 class DataInterface:
     """Provides interface functions to the database."""
 
@@ -206,3 +209,44 @@ class DataInterface:
         with Session(self._engine) as session:
             nodes = session.query(MonitorNode)
             return [n.as_dict() for n in nodes]
+
+    def update_schema(self):
+        """Performs manual steps to update db schema from older versions."""
+        with self._engine.connect() as conn:
+            try:
+                conn.execute(text("SELECT COUNT(entry_id) FROM stats_entries;"))
+            except Exception as ex:
+                # Create new tempory table
+                tmp_meta = MetaData()
+                new_table = Table(
+                    "stats_entries_new",
+                    tmp_meta,
+                    *[ 
+                        Column(
+                            c.name, 
+                            c.type,
+                            primary_key = c.primary_key,
+                            nullable = c.nullable,
+                            autoincrement = c.autoincrement,
+                        ) for c in StatsInstance.__table__.columns
+                    ]
+                )
+                tmp_meta.create_all(bind=conn)
+                #new_table.create(conn)
+
+                # Copy data over
+                cols = ",".join([c.name for c in StatsInstance.__table__.columns if c.name != "entry_id"])
+                conn.execute(text(
+                    f"INSERT INTO stats_entries_new ({cols}) SELECT * FROM stats_entries;"
+                ))
+
+                # Drop old table
+                StatsInstance.__table__.drop(conn)
+
+                # Rename table
+                conn.execute(text(
+                    "ALTER TABLE stats_entries_new RENAME TO stats_entries;"
+                ))
+
+                # Commit
+                conn.commit()

@@ -12,6 +12,8 @@ if "DEBUG" in os.environ:
 
 app = Flask(__name__)
 db = DataInterface(os.environ.get("DB_CONN", "sqlite+pysqlite:///test.db"))
+db.update_schema()
+
 scheduler = BackgroundScheduler()
 if "FIRMWARE_URL" in os.environ:
     get_firmware_archive(db, os.environ["FIRMWARE_URL"], app.logger)
