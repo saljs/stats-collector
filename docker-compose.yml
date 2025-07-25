@@ -1,33 +1,27 @@
-version: '3.1'
 services:
   database:
     image: 'mysql:latest'
     restart: always
     environment:
       MYSQL_DATABASE: vivmonitors
-      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: stats_collector
-      MYSQL_PASSWORD: changeme
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - 'mysql-db:/var/lib/mysql'
-  collector:
-    image: 'ghcr.io/saljs/stats-collector:main'
+      - ./db:/var/lib/mysql
+  stats-server:
+    image: ghcr.io/saljs/stats-collector:main
     restart: always
     ports:
       - '5000:5000'
     environment:
-      DB_CONN: 'mysql+pymysql://stats_collector:changeme@database/vivmonitors'
+      DB_CONN: mysql+pymysql://stats_collector:${MYSQL_PASSWORD}@database/vivmonitors
       PORT: 5000
       FIRMWARE_URL: 'https://github.com/saljs/viv_clients/releases/latest/download/fw_bundle.zip'
   grafana:
-    image: 'grafana/grafana:latest'
+    image: grafana/grafana:latest
     restart: always
     ports:
       - '3000:80'
     volumes:
-      - 'grafana-data:/var/lib/grafana'
-volumes:
-  grafana-data:
-    name: grafana-data-vol
-  mysql-db:
-    name: mysql-db-vol
+      - ./grafana-data:/var/lib/grafana
