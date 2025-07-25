@@ -8,7 +8,7 @@ services:
       MYSQL_USER: stats_collector
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - ./db:/var/lib/mysql
+      - ${DATA_PATH}/db:/var/lib/mysql
   stats-server:
     image: ghcr.io/saljs/stats-collector:main
     restart: always
@@ -24,4 +24,4 @@ services:
     ports:
       - '3000:80'
     volumes:
-      - ./grafana-data:/var/lib/grafana
+      - ${DATA_PATH}/grafana-data:/var/lib/grafana
